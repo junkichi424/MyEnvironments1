@@ -44,26 +44,6 @@ else {
     Write-Host "Already installed."
 }
 
-############################################################################
-# CapsLock -> Ctrl
-############################################################################
-Write-Host -NoNewLine "Check Scancode Map..."
-$keyboardLayoutPath = "Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout"
-if (-not (Get-ItemProperty $keyboardLayoutPath)."Scancode Map") {
-    Write-Host -message "Replace Caps with Ctrl."
-    Set-ItemProperty `
-        "Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout" `
-        -name "Scancode Map" -value (`
-            0x00, 0x00, 0x00, 0x00, `
-            0x00, 0x00, 0x00, 0x00, `
-            0x02, 0x00, 0x00, 0x00, `
-            0x1D, 0x00, 0x3A, 0x00, `
-            0x00, 0x00, 0x00, 0x00 `
-    ) -type binary
-}
-else {
-    Write-Host -message "Already Replaced."
-}
 
 ############################################################################
 # PowerShell execution policy
