@@ -67,22 +67,11 @@ if (!(Test-Path C:\Repos\MyEnvironments)) {
         New-Item -ItemType Directory C:\Repos > $null
     }
 
-    git clone https://github.com/nuitsjp/MyEnvironments.git C:\Repos\MyEnvironments
+    git clone https://github.com/junkichi424/MyEnvironments1.git C:\Repos\MyEnvironments1
 }
 else {
     Write-Host "Already cloned."
 }
 
-############################################################################
-# Hyper-V
-############################################################################
-Write-Host -NoNewLine "Check Hyper-V..."
-if (((Get-WindowsOptionalFeature -Online | Where-Object { $_.FeatureName -eq 'Microsoft-Hyper-V' })[0].State) -eq 'Disabled') {
-    Write-Host "Enable Hyper-V. After enabled, reboot."
-    Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
-}
-else {
-    Write-Host "Already enabled."
-}
 
 Read-Host -Prompt "Press any key to exit."
