@@ -2,6 +2,9 @@
 
 Windowsの開発環境を構築・メンテナンスするためのスクリプトなどです。
 
+# 事前準備
+
+[Windows への PowerShell のインストール](https://learn.microsoft.com/ja-jp/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.4#installing-the-msi-package)
 
 # 初回実行
 
