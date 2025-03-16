@@ -33,23 +33,13 @@ Import-Module -Name GistGet
 # Git
 ############################################################################
 Write-Host -NoNewLine "Check Git.Git..."
-$gitInstalled = $false
-try {
-    $gitInstalled = $null -ne (Get-Command winget -ErrorAction SilentlyContinue) -and 
-                   ($null -ne (& winget list --id Git.Git 2>$null))
-}
-catch {
-    $gitInstalled = $false
-}
-
-if (-not $gitInstalled) {
+if (-not (Get-WinGetPackage -Id Git.Git)) {
     Write-Host "Install Git.Git."
-    winget install --id Git.Git --accept-source-agreements --accept-package-agreements
+    winget install --id Git.Git
     
-    # Update PATH for current session
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
-    git config --global user.name "Junki Akiyama"
-    git config --global user.email "junki@example.jp"
+    $env:Path += ";$env:ProgramFiles\Git\cmd\"
+    git config --global user.name "Atsushi Nakamura"
+    git config --global user.email "nuits.jp@live.jp"
 }
 else {
     Write-Host "Already installed."
