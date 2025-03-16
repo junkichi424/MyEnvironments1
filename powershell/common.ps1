@@ -2,13 +2,17 @@ function Use-TempDir {
     param (
         [ScriptBlock]$Script
     )
-    $tmp = $env:TEMP | Join-Path -ChildPath $([System.Guid]::NewGuid().Guid)
-    New-Item -ItemType Directory -Path $tmp | Push-Location
+    # Use more reliable temp directory path with PS7
+    $tmp = [System.IO.Path]::GetTempPath() | Join-Path -ChildPath $([System.Guid]::NewGuid().ToString())
+    New-Item -ItemType Directory -Path $tmp -Force | Out-Null
+    Push-Location -Path $tmp
     try {
-        Invoke-Command -ScriptBlock $script
+        & $Script
     }
     finally {
         Pop-Location
-        $tmp | Remove-Item -Recurse
+        if (Test-Path -Path $tmp) {
+            Remove-Item -Path $tmp -Recurse -Force -ErrorAction SilentlyContinue
+        }
     }
 }

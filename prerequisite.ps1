@@ -2,7 +2,8 @@
 # PSGallery
 ############################################################################
 Write-Host -NoNewLine "Check PSGallery InstallationPolicy..."
-if ((Get-PSRepository -Name PSGallery).InstallationPolicy -eq 'Untrusted') {
+$psRepository = Get-PSRepository -Name PSGallery -ErrorAction SilentlyContinue
+if ($null -ne $psRepository -and $psRepository.InstallationPolicy -eq 'Untrusted') {
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
     Write-Host "InstallationPolicy is set to Trusted."
 }
@@ -32,18 +33,27 @@ Import-Module -Name GistGet
 # Git
 ############################################################################
 Write-Host -NoNewLine "Check Git.Git..."
-if (-not (Get-WinGetPackage -Id Git.Git)) {
+$gitInstalled = $false
+try {
+    $gitInstalled = $null -ne (Get-Command winget -ErrorAction SilentlyContinue) -and 
+                   ($null -ne (& winget list --id Git.Git 2>$null))
+}
+catch {
+    $gitInstalled = $false
+}
+
+if (-not $gitInstalled) {
     Write-Host "Install Git.Git."
-    winget install --id Git.Git
+    winget install --id Git.Git --accept-source-agreements --accept-package-agreements
     
-    $env:Path += ";$env:ProgramFiles\Git\cmd\"
-    git config --global user.name "Atsushi Nakamura"
-    git config --global user.email "nuits.jp@live.jp"
+    # Update PATH for current session
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+    git config --global user.name "Junki Akiyama"
+    git config --global user.email "junki@example.jp"
 }
 else {
     Write-Host "Already installed."
 }
-
 
 ############################################################################
 # PowerShell execution policy
@@ -51,7 +61,7 @@ else {
 Write-Host -NoNewLine "Check PowerShell execution policy..."
 if ((Get-ExecutionPolicy -Scope CurrentUser) -ne "RemoteSigned") {
     Write-Host "Set PowerShell execution policy for current user."
-    Set-ExecutionPolicy RemoteSigned -scope CurrentUser
+    Set-ExecutionPolicy RemoteSigned -scope CurrentUser -Force
 }
 else {
     Write-Host "Already Set."
@@ -61,7 +71,7 @@ else {
 # MyEnvironments
 ############################################################################
 Write-Host -NoNewLine "Check MyEnvironments..."
-if (!(Test-Path C:\Repos\MyEnvironments)) {
+if (!(Test-Path C:\Repos\MyEnvironments1)) {
     Write-Host "Clone MyEnvironments."
     if (!(Test-Path C:\Repos)) {
         New-Item -ItemType Directory C:\Repos > $null
@@ -72,6 +82,5 @@ if (!(Test-Path C:\Repos\MyEnvironments)) {
 else {
     Write-Host "Already cloned."
 }
-
 
 Read-Host -Prompt "Press any key to exit."
